@@ -1,5 +1,5 @@
 import React, { useState, memo, useCallback } from 'react';
-import { Sword, Sparkles, Users, Zap, AlertTriangle, Share2, Check, Ban, ChevronDown, ChevronUp } from 'lucide-react';
+import { Sword, Sparkles, Users, Zap, Share2, Check, Ban, ChevronDown, ChevronUp } from 'lucide-react';
 import { ProcessedCharacter, GroupedMatch } from '../types';
 import { formatCombatPower, calculateAverage } from '../matchingLogic';
 
@@ -12,26 +12,15 @@ interface RaidCardProps {
 }
 
 // 1. 시너지 타입 분류 및 아이콘 로직을 컴포넌트 외부로 이동 (메모리 절약 및 안정성)
-const getSynergyType = (text: string) => {
-  if (!text) return 'none';
-  if (text.includes('치명타')) return 'crit';
-  if (text.includes('방어력')) return 'def';
-  if (text.includes('받는 피해')) return 'dmg';
-  if (text.includes('공격력')) return 'atk';
-  if (text.includes('공격 속도') || text.includes('이동 속도')) return 'speed';
-  return text;
-};
-
 const getClassIcon = (className: string) => {
   if (['바드', '홀리나이트', '도화가'].includes(className)) return <Sparkles className="w-4 h-4 text-blue-500 dark:text-blue-400" />;
   return <Sword className="w-4 h-4 text-red-500 dark:text-red-400" />;
 };
 
 // 2. 개별 캐릭터 항목을 memo 컴포넌트로 분리
-const CharacterItem = memo(({ char, isSelected, isSynergyDuplicate, raidId, pIdx, onToggle }: {
+const CharacterItem = memo(({ char, isSelected, raidId, pIdx, onToggle }: {
   char: ProcessedCharacter;
   isSelected: boolean;
-  isSynergyDuplicate: boolean;
   raidId: string;
   pIdx: number;
   onToggle: (raidId: string, pIdx: number, char: ProcessedCharacter) => void;
@@ -76,10 +65,9 @@ const CharacterItem = memo(({ char, isSelected, isSynergyDuplicate, raidId, pIdx
       </div>
       {!isSupport && char.synergy && (
         <div className="mt-2 pt-2 border-t border-gray-50 dark:border-gray-800/50">
-          <div className={`text-[11px] font-medium flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border ${isSynergyDuplicate ? 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700/50 animate-pulse' : 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border-amber-200/50 dark:border-amber-700/30'}`}>
-            {isSynergyDuplicate ? <AlertTriangle className="w-3 h-3 text-red-500" /> : <Zap className="w-3 h-3 text-amber-500" />}
+          <div className="text-[11px] font-medium flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border-amber-200/50 dark:border-amber-700/30">
+            <Zap className="w-3 h-3 text-amber-500" />
             <span>{char.synergy}</span>
-            {isSynergyDuplicate && <span className="text-[9px] ml-auto font-bold text-red-500">중복</span>}
           </div>
         </div>
       )}
@@ -120,19 +108,6 @@ export const RaidCard = memo(({
   const displaySupportCount = hasSelection
     ? selectedChars.filter(c => c.role === '서포터').length
     : match.supportCount;
-
-  // 선택된 딜러들의 시너지 중복 확인
-  const activeSynergies = new Set<string>();
-  const duplicateSynergies = new Set<string>();
-
-  selectedChars.forEach(char => {
-    if (char.role === '서포터' || !char.synergy) return;
-    const type = getSynergyType(char.synergy);
-    if (activeSynergies.has(type)) {
-      duplicateSynergies.add(type);
-    }
-    activeSynergies.add(type);
-  });
 
   const handleShare = async () => {
     if (!hasSelection) return;
@@ -248,15 +223,12 @@ export const RaidCard = memo(({
               <div className="space-y-3">
                 {visibleChars.map(char => {
                   const isSelected = selections[pIdx]?.CharacterName === char.CharacterName;
-                  const isSupport = char.role === '서포터';
-                  const isSynergyDuplicate = isSelected && !isSupport && char.synergy && duplicateSynergies.has(getSynergyType(char.synergy));
 
                   return (
                     <CharacterItem
                       key={`${char.ServerName}-${char.CharacterName}`}
                       char={char}
                       isSelected={isSelected}
-                      isSynergyDuplicate={!!isSynergyDuplicate}
                       raidId={match.raidId}
                       pIdx={pIdx}
                       onToggle={onToggleSelection}

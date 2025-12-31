@@ -729,7 +729,7 @@ function App() {
                 <h4 className="text-sm font-black text-yellow-600 dark:text-lostark-gold uppercase tracking-widest mb-3">제작 의도</h4>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                   "고정 공대원들과 매주 레이드를 갈 때, 캐릭터가 레벨업을 하면 갈 수 있는 곳이 많아지기도 하고 때로는 굳이 안 가도 되는 레이드가 생기기도 하죠. <br/><br/>
-                  <strong>로아 스쿼드</strong>는 이러한 변화를 한눈에 파악하여, 우리 공대원들이 이번 주에 <strong>함께 갈 수 있는 최적의 레이드</strong>가 무엇인지 쉽게 찾기 위해 만들어졌습니다."
+                  <strong>로아 스쿼드</strong>는 이러한 변화를 한눈에 파악하여, 우리 공대원들이 이번 주에 <strong>함께 갈 수 있는 레이드</strong>가 무엇인지 쉽게 찾기 위해 만들어졌습니다."
                 </p>
               </section>
               
@@ -746,7 +746,7 @@ function App() {
                   </li>
                   <li className="flex gap-2">
                     <span className="text-yellow-500 font-bold">3.</span>
-                    <span>레이드 탭을 넘겨보며 참여할 캐릭터를 클릭해 <strong>파티를 구성</strong>해보세요.</span>
+                    <span>레이드 탭을 넘겨보며 참여할 캐릭터를 클릭해 <strong>조합을 확인</strong>해보세요.</span>
                   </li>
                 </ul>
               </section>
