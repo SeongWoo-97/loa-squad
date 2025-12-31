@@ -190,26 +190,24 @@ export const RaidCard = memo(({
           const isExpanded = !!expandedParticipants[pIdx];
           const selectedCharName = selections[pIdx]?.CharacterName;
           
-          const { visibleChars, hasMore, hiddenCount } = (() => {
-            if (chars.length <= INITIAL_SHOW_COUNT) {
-              return { visibleChars: chars, hasMore: false, hiddenCount: 0 };
-            }
-            if (isExpanded) {
-              return { visibleChars: chars, hasMore: true, hiddenCount: 0 };
-            }
-            const sliced = chars.slice(0, INITIAL_SHOW_COUNT);
-            const selectedIdx = chars.findIndex(c => c.CharacterName === selectedCharName);
-            
-            // 선택된 캐릭터가 초기 노출 범위를 벗어나 있다면, 해당 캐릭터를 목록 끝에 추가하여 보여줌
-            if (selectedIdx !== -1 && selectedIdx >= INITIAL_SHOW_COUNT) {
-              return { 
-                visibleChars: [...sliced, chars[selectedIdx]], 
-                hasMore: true, 
-                hiddenCount: chars.length - INITIAL_SHOW_COUNT - 1 
-              };
-            }
-            return { visibleChars: sliced, hasMore: true, hiddenCount: chars.length - INITIAL_SHOW_COUNT };
-          })();
+          // 노출할 캐릭터 계산 로직 개선
+          let visibleChars = chars.length <= INITIAL_SHOW_COUNT || isExpanded 
+            ? chars 
+            : chars.slice(0, INITIAL_SHOW_COUNT);
+          
+          const hasMore = chars.length > INITIAL_SHOW_COUNT;
+          const selectedIdx = chars.findIndex(c => c.CharacterName === selectedCharName);
+          
+          // 선택된 캐릭터가 숨겨져 있다면 목록 끝에 강제로 추가
+          if (!isExpanded && selectedIdx >= INITIAL_SHOW_COUNT) {
+            visibleChars = [...visibleChars, chars[selectedIdx]];
+          }
+
+          const hiddenCount = isExpanded ? 0 : (
+            selectedIdx >= INITIAL_SHOW_COUNT 
+              ? chars.length - INITIAL_SHOW_COUNT - 1 
+              : chars.length - INITIAL_SHOW_COUNT
+          );
 
           return (
             <div key={pIdx} className="flex flex-col gap-4">
